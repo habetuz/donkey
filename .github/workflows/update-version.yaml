@@ -16,15 +16,15 @@ jobs:
           fetch-depth: 0
 
       - name: Get next version
+        uses: thenativeweb/get-next-version@main
         id: version
-        uses: get-next-version@v1
 
       - name: Update package.json
         run: |
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
-      # - name: Push changes
-      #   uses: stefanzweifel/git-auto-commit-action@v5
-      #   with:
-      #     commit_message: 'chore: update version to ${{ steps.version.outputs.version }}'
-      #     tagging_message: 'v${{ steps.version.outputs.version }}'
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: update version to ${{ steps.version.outputs.version }}'
+          tagging_message: 'v${{ steps.version.outputs.version }}'
