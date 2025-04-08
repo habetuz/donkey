@@ -1,0 +1,26 @@
+name: Release
+on:
+  push:
+    # Sequence of patterns matched against refs/heads and refs/tags
+    branches:
+      - 'main' # Only run on the main branch
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.0, etc.
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm ci
+      - name: Build the project
+        run: npm run build
+      - name: Create release tarball
+        run: tar -czvf release.tar.gz -C dist .
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'release.tar.gz'
+          name: 'Release ${{ github.ref }}'
