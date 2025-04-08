@@ -35,7 +35,7 @@ jobs:
           tagging_message: 'v${{ steps.version.outputs.version }}'
   release:
     permissions:
-      contents: read
+      contents: write
       id-token: write
       pages: write
     needs: update-version
