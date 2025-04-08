@@ -35,7 +35,9 @@ jobs:
           tagging_message: 'v${{ steps.version.outputs.version }}'
   release:
     permissions:
-      contents: write
+      contents: read
+      id-token: write
+      pages: write
     needs: update-version
     if: needs.update-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
