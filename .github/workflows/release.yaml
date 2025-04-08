@@ -1,26 +1,58 @@
 name: Release
 on:
   push:
-    # Sequence of patterns matched against refs/heads and refs/tags
     branches:
-      - 'main' # Only run on the main branch
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.0, etc.
-
+      - main
 jobs:
-  build:
-    name: Create Release
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      tag: ${{ steps.version.outputs.version }}
+      should_release: ${{ steps.version.outputs.shouldRelease }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get next version
+        uses: thenativeweb/get-next-version@main
+        id: version
+
+      - name: Update package.json
+        run: |
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: update version to ${{ steps.version.outputs.version }}'
+          tagging_message: 'v${{ steps.version.outputs.version }}'
+  release:
+    needs: update-version
+    if: needs.update-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
       - name: Install dependencies
         run: npm ci
       - name: Build the project
         run: npm run build
       - name: Create release tarball
         run: tar -czvf release.tar.gz -C dist .
-      - uses: ncipollo/release-action@v1
+      - name: Release
+        uses: ncipollo/release-action@v1
         with:
           artifacts: 'release.tar.gz'
           name: 'Release ${{ github.ref }}'
+          tag: 'v${{ needs.update-version.outputs.tag }}'
