@@ -20,7 +20,7 @@ loadImages()
     imagery.
   </p>
   <div class="image-grid">
-    <div v-for="src in images" class="image-item">
+    <div v-for="(src, index) in images" :key="index" class="image-item">
       <img :src="src" alt="Image" />
     </div>
   </div>
