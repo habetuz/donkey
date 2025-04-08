@@ -53,6 +53,21 @@ jobs:
         run: npm ci
       - name: Build the project
         run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: ./dist
+  release:
+    runs-on: ubuntu-latest
+    needs: [update-version, build-artifact]
+    permissions:
+      contents: read
+    if: needs.update-version.outputs.should_release == 'true'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: ./dist
       - name: Create release tarball
         run: tar -czvf release.tar.gz -C dist .
       - name: Release
@@ -61,10 +76,6 @@ jobs:
           artifacts: 'release.tar.gz'
           name: 'Release v${{ needs.update-version.outputs.tag }}'
           tag: 'v${{ needs.update-version.outputs.tag }}'
-      - uses: actions/upload-artifact@v4
-        with:
-          name: release
-          path: ./dist
 
   deploy:
     runs-on: ubuntu-latest
