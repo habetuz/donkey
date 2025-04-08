@@ -53,9 +53,7 @@ jobs:
         run: npm ci
       - name: Build the project
         run: npm run build
-      - name: Change permissions
-        run: chmod -R a+rX ./dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: github-pages
           path: ./dist
