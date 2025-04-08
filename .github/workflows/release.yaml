@@ -11,7 +11,7 @@ jobs:
       packages: write
     outputs:
       tag: ${{ steps.version.outputs.version }}
-      should_release: ${{ steps.version.outputs.shouldRelease }}
+      should_release: ${{ steps.version.outputs.hasNextVersion }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,6 +32,9 @@ jobs:
           commit_message: 'chore: update version to ${{ steps.version.outputs.version }}'
           tagging_message: 'v${{ steps.version.outputs.version }}'
   release:
+    permissions:
+      contents: write
+      packages: write
     needs: update-version
     if: needs.update-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
