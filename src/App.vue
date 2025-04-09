@@ -19,6 +19,7 @@ loadImages()
     Welcome to our website, where we celebrate the charm and elegance of donkeys through stunning
     imagery.
   </p>
+  <p>Images come from https://www.pexels.com</p>
   <div class="image-grid">
     <div v-for="(src, index) in images" :key="index" class="image-item">
       <img :src="src" alt="Image" />
